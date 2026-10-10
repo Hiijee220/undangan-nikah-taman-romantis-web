@@ -1,0 +1,32 @@
+import ts from 'typescript';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+function moduleUrl(source){return 'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64')}
+const configUrl=moduleUrl(await readFile('src/config.ts','utf8'));
+const {defaults,cleanSettings}=await import(configUrl);
+const github=await import(moduleUrl((await readFile('src/github.ts','utf8')).replace("'./config'",JSON.stringify(configUrl))));
+const requests=[];
+globalThis.fetch=async(url,init)=>{
+ requests.push({url,init});
+ if(url.endsWith('/contents/data.json?ref=main'))return Response.json({sha:'original',content:Buffer.from(JSON.stringify(defaults)).toString('base64')});
+ if(url.endsWith('/contents/data.json'))return Response.json({content:{sha:'next'}});
+ return Response.json({full_name:github.repository,permissions:{push:true}});
+};
+await assert.rejects(github.saveSettings(defaults),/login/);
+await github.login('test-memory-only');
+await github.saveSettings({...defaults,groom:'Jeivan — ♥',giftEnabled:false,bankAccounts:[{id:'a',bank:'Demo',number:'1234567',holder:'Pemilik'}]});
+const first=JSON.parse(requests.at(-1).init.body);
+assert.equal(first.sha,'original');
+const data=JSON.parse(Buffer.from(first.content,'base64').toString());
+assert.equal(data.groom,'Jeivan — ♥');assert.deepEqual(data.bankAccounts,[]);
+await github.saveSettings(defaults);
+assert.equal(JSON.parse(requests.at(-1).init.body).sha,'next');
+assert.equal(cleanSettings({...defaults,groomPhoto:'./uploads/abc.jpg'}).groomPhoto,'./uploads/abc.jpg');
+assert.throws(()=>cleanSettings({...defaults,mapUrl:'javascript:alert(1)'}));
+assert.throws(()=>cleanSettings({...defaults,musicUrl:'http://example.com/music.mp3'}));
+globalThis.fetch=async()=>Response.json({},{status:409});
+await assert.rejects(github.saveSettings(defaults),/sesi lain/);
+globalThis.fetch=async()=>Response.json({},{status:401});
+await assert.rejects(github.saveSettings(defaults),/Token tidak valid/);
+await assert.rejects(github.saveSettings(defaults),/login/);
+console.log('Passed: unauthenticated writes, Unicode, disabled gifts, SHA conflict protection, unsafe URLs, token expiry.');
