@@ -1,0 +1,40 @@
+// TAMBAHKAN di dalam match /databases/{database}/documents { ... }
+// PERTAHANKAN aturan undangan lama. Ini bukan pengganti seluruh file Rules.
+function tamanAdmin() {
+  return request.auth != null
+    && request.auth.token.email == 'remajasilo.rs@gmail.com'
+    && request.auth.token.email_verified == true;
+}
+match /invitationTamanRomantis/{id} {
+  allow read: if true;
+  allow create, update: if tamanAdmin() && (
+    id == 'content' || (
+      request.resource.data.keys().hasOnly(['dataUrl', 'updatedAt'])
+      && request.resource.data.dataUrl is string
+      && request.resource.data.dataUrl.size() < 900000
+      && request.resource.data.dataUrl.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')
+      && request.resource.data.updatedAt is string
+    )
+  );
+  allow delete: if tamanAdmin();
+}
+match /invitationTamanRomantisResponses/{id} {
+  allow read: if true;
+  allow create: if id.matches('rsvp-[A-Za-z0-9-]{1,100}')
+    && request.resource.data.keys().hasAll(['name','message','attendance','guestCount','createdAt'])
+    && request.resource.data.keys().hasOnly(['name','message','attendance','guestCount','createdAt'])
+    && request.resource.data.name is string
+    && request.resource.data.name.size() > 0
+    && request.resource.data.name.size() <= 80
+    && request.resource.data.message is string
+    && request.resource.data.message.size() > 0
+    && request.resource.data.message.size() <= 500
+    && request.resource.data.attendance in ['hadir','tidak_hadir','ragu']
+    && request.resource.data.guestCount is int
+    && ((request.resource.data.attendance == 'hadir' && request.resource.data.guestCount >= 1 && request.resource.data.guestCount <= 4)
+      || (request.resource.data.attendance != 'hadir' && request.resource.data.guestCount == 0))
+    && request.resource.data.createdAt is timestamp
+    && request.resource.data.createdAt >= request.time - duration.value(5, 'm')
+    && request.resource.data.createdAt <= request.time + duration.value(1, 'm');
+  allow update, delete: if tamanAdmin();
+}
