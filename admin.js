@@ -1,12 +1,12 @@
 import{auth,db,CONTENT_COLLECTION,ADMIN_EMAIL}from"./firebase.js";
-import{defaults}from"./defaults.js?v=polish-3";
-import {baptismContent} from "./content.mjs?v=polish-3";
+import{defaults}from"./defaults.js?v=music-5";
+import {baptismContent} from "./content.mjs?v=music-5";
 import{saveContent}from"./persistence.mjs";
-import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=polish-3";
+import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=music-5";
 import{GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import{doc,getDoc,setDoc,runTransaction}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-import {createPhotoLoader,rememberPhoto,mapPhotos} from './photo-cache.mjs?v=photos-4';
+import {createPhotoLoader,rememberPhoto,mapPhotos} from './photo-cache.mjs?v=music-5';
 
 const fieldGroups=[
   ["Sampul & Nama Tamu",[["childName","Nama panggilan anak"],["initials","Inisial atau simbol sampul"],["baptismLabel","Judul sampul baptisan"],["guestHeading","Sapaan tamu"],["guestNote","Catatan nama tamu","textarea"],["openButtonText","Tulisan tombol buka"]]],
@@ -23,6 +23,7 @@ const fieldGroups=[
   ["Cerita 3",[["journey3Year","Tahun / tanggal cerita 3"],["journey3Title","Judul cerita 3"],["journey3Text","Isi cerita 3","textarea"]]],
   ["Judul Cerita",[["journeyLabel","Tulisan Our Story"],["journeyTitle","Judul bagian cerita"]]],
   ["Ucapan & RSVP",[["rsvpLabel","Tulisan Ucapan & RSVP"],["rsvpTitle","Judul RSVP"],["rsvpText","Penjelasan RSVP","textarea"],["rsvpButtonText","Tulisan tombol kirim"]]],
+  ["Gulir Otomatis",[["autoScrollEnabled","Mulai otomatis setelah undangan dibuka","select"],["autoScrollSpeed","Kecepatan gulir","scroll-speed"]]],
   ["Musik",[["musicTitle","Judul musik"],["musicUrl","Link MP3, OGG, YouTube, atau Google Drive","url"]]],
   ["Penutup & Sosial Media",[["closingLabel","Tulisan penutup"],["footerText","Ucapan terima kasih","textarea"],["closingCredit","Tulisan kecil paling bawah"],["whatsappUrl","Link WhatsApp","url"],["instagramUrl","Link Instagram","url"]]],
   ["Menu & Hitung Mundur",[["navHome","Menu Home"],["navChild","Menu Anak"],["navEvent","Menu Acara"],["navGallery","Menu Galeri"],["navRsvp","Menu Ucapan"],["countdownDay","Label hari"],["countdownHour","Label jam"],["countdownMinute","Label menit"],["countdownSecond","Label detik"]]]
@@ -51,7 +52,7 @@ async function operation(action){if(busy)return;busy=true;$('#contentForm').iner
 onAuthStateChanged(auth,async user=>{ready=false;$('#editor').hidden=true;$('#login').hidden=false;$('#verifyEmailBtn').hidden=true;$('#user').textContent=user?.email||'Silakan masuk';if(!user)return;if(user.email?.toLowerCase()!==ADMIN_EMAIL){setLoginStatus('Akun ini bukan admin undangan.',true);await signOut(auth);return;}if(!user.emailVerified){$('#verifyEmailBtn').hidden=false;setLoginStatus('Verifikasi email admin terlebih dahulu, atau masuk dengan akun Google yang sama.',true);return;}try{const snapshot=await getDoc(doc(db,CONTENT_COLLECTION,'content'));const saved=snapshot.exists()?snapshot.data():{};data=baptismContent(saved);revision=Number(saved.revision||0);ready=true;$('#login').hidden=true;$('#editor').hidden=false;await render();}catch(error){setLoginStatus(firebaseError(error),true);}});
 $('#verifyEmailBtn').onclick=async()=>{try{if(auth.currentUser?.email?.toLowerCase()!==ADMIN_EMAIL)throw new Error('Masuk menggunakan email admin terlebih dahulu.');await sendEmailVerification(auth.currentUser);setLoginStatus('Email verifikasi dikirim. Setelah verifikasi, muat ulang dan login kembali.');}catch(error){setLoginStatus(firebaseError(error),true);}};
 
-function renderFields(){$("#fields").innerHTML=fieldGroups.map(([title,fields])=>`<section class="field-group"><h3>${esc(title)}</h3><div class="field-group-grid">${fields.map(([key,label,type])=>`<label class="field ${type==="textarea"?"field-wide":""}"><span>${esc(label)}</span>${type==="select"?`<select name="${key}"><option value="yes" ${data[key]!=="no"?"selected":""}>Ya</option><option value="no" ${data[key]==="no"?"selected":""}>Tidak</option></select>`:type==="textarea"?`<textarea name="${key}">${esc(data[key])}</textarea>`:`<input name="${key}" type="${type||"text"}" value="${esc(data[key])}">`}</label>`).join("")}</div></section>`).join("")}
+function renderFields(){$("#fields").innerHTML=fieldGroups.map(([title,fields])=>`<section class="field-group"><h3>${esc(title)}</h3><div class="field-group-grid">${fields.map(([key,label,type])=>`<label class="field ${type==="textarea"?"field-wide":""}"><span>${esc(label)}</span>${type==="scroll-speed"?`<select name="${key}">${[["slow","Pelan"],["normal","Sedang"],["fast","Cepat"]].map(([value,title])=>`<option value="${value}" ${data[key]===value?"selected":""}>${title}</option>`).join("")}</select>`:type==="select"?`<select name="${key}"><option value="yes" ${data[key]!=="no"?"selected":""}>Ya</option><option value="no" ${data[key]==="no"?"selected":""}>Tidak</option></select>`:type==="textarea"?`<textarea name="${key}">${esc(data[key])}</textarea>`:`<input name="${key}" type="${type||"text"}" value="${esc(data[key])}">`}</label>`).join("")}</div></section>`).join("")}
 const imageUrl=createPhotoLoader(async id=>{const snapshot=await getDoc(doc(db,CONTENT_COLLECTION,id));return snapshot.exists()?snapshot.data().dataUrl:''},{valid:safeImage});
 async function render(){renderFields();$("#theme").value=data.theme||"sky";document.documentElement.dataset.theme=data.theme||"sky";$("#imageSlots").innerHTML=imageSlots.map(([key,label])=>`<label class="upload-card"><span>${esc(label)}</span><input type="file" data-image-slot="${key}" accept="image/jpeg,image/png,image/webp,image/heic,image/heif"><img class="single-preview" data-preview="${key}" alt="Pratinjau ${esc(label)}" loading="lazy" decoding="async" hidden></label>`).join("");
   document.querySelectorAll("[data-image-slot]").forEach(input=>input.onchange=event=>operation(()=>uploadSingle(event.target)));

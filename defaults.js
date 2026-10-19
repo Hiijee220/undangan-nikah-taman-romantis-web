@@ -59,8 +59,8 @@ export const defaults={
   "closingCredit": "Made with love",
   "whatsappUrl": "",
   "instagramUrl": "",
-  "musicTitle": "Musik Baptisan",
-  "musicUrl": "https://hiijee220.github.io/undangan-nikah-taman-romantis-web/audio/serene.mp3",
+  "musicTitle": "Mary Star Li",
+  "musicUrl": "https://hiijee220.github.io/undangan-nikah-taman-romantis-web/audio/mary-star-li.mp3",
   "theme": "sky",
   "navHome": "Home",
   "navChild": "Anak",
@@ -91,5 +91,8 @@ export const defaults={
   "galleryBlessingReference": "Bilangan 6:24–26",
   "fatherName": "[Nama ayah]",
   "motherName": "[Nama ibu]",
-  "navRsvp": "Ucapan"
+  "navRsvp": "Ucapan",
+  "musicRelease": "mary-v1",
+  "autoScrollEnabled": "yes",
+  "autoScrollSpeed": "normal"
 };

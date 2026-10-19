@@ -12,6 +12,8 @@ export function safeImage(value){
 export function cleanContent(value){
  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Data undangan tidak valid.');
  const data={...value};
+ if(data.autoScrollEnabled!==undefined&&!['yes','no'].includes(data.autoScrollEnabled))throw new Error('Pengaturan gulir otomatis tidak valid.');
+ if(data.autoScrollSpeed!==undefined&&!['slow','normal','fast'].includes(data.autoScrollSpeed))throw new Error('Kecepatan gulir tidak valid.');
  if(!THEMES.includes(data.theme))throw new Error('Pilih tema yang tersedia.');
  for(const [key,val]of Object.entries(data)){
   if(typeof val==='string'){

@@ -2,11 +2,13 @@ const PROJECT_ID="jeivan-82577";
 const DOCUMENT_ROOT=`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 const INVITATION_ROOT=`${DOCUMENT_ROOT}/invitationTamanRomantis/`;
 
-import {defaults as fallback} from './defaults.js?v=polish-3';
-import {baptismContent} from './content.mjs?v=polish-3';
-import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=polish-3';
+import {defaults as fallback} from './defaults.js?v=music-5';
+import {baptismContent} from './content.mjs?v=music-5';
+import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=music-5';
 
-import {createPhotoLoader,mapPhotos} from './photo-cache.mjs?v=photos-4';
+import {createPhotoLoader,mapPhotos} from './photo-cache.mjs?v=music-5';
+
+import {createAutoScroller} from './auto-scroll.mjs?v=music-5';
 
 const $=selector=>document.querySelector(selector);
 const safe=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -18,6 +20,16 @@ async function loadContent(){try{return baptismContent(await getDocument("conten
 
 let content={...fallback},eventDate=new Date(),countdownTimer=null,heroTimer=null,currentGallery=[],lightboxIndex=0,music=null,youtubeFrame=null,musicPlaying=false,musicKey="",invitationOpened=false;
 const guestFromLink=new URLSearchParams(location.search).get("to")?.trim()||"Bapak/Ibu/Saudara/i";
+
+const scrollButton=$('#autoScrollButton');let previousScrollBehavior='';
+const autoScroller=createAutoScroller({position:()=>window.scrollY,limit:()=>Math.max(0,document.documentElement.scrollHeight-window.innerHeight),move:top=>window.scrollTo(0,top),request:callback=>requestAnimationFrame(callback),cancel:id=>cancelAnimationFrame(id),change:running=>{
+ if(running){previousScrollBehavior=document.documentElement.style.scrollBehavior;document.documentElement.style.scrollBehavior='auto'}else document.documentElement.style.scrollBehavior=previousScrollBehavior;
+ scrollButton.setAttribute('aria-pressed',String(running));scrollButton.setAttribute('aria-label',running?'Jeda gulir otomatis':'Mulai gulir otomatis');scrollButton.querySelector('small').textContent=running?'Jeda':'Gulir';scrollButton.querySelector('span').textContent=running?'Ⅱ':'↓';
+}});
+function configureAutoScroll(){autoScroller.setSpeed({slow:18,normal:28,fast:40}[content.autoScrollSpeed]||28);scrollButton.hidden=!invitationOpened;if(content.autoScrollEnabled==='no')autoScroller.pause()}
+scrollButton.onclick=()=>{if(autoScroller.running)autoScroller.pause();else autoScroller.start()};
+function pauseForInteraction(event){if(!event.target.closest?.('#autoScrollButton,#openInvitation')&&autoScroller.running)autoScroller.pause()}
+document.addEventListener('pointerdown',pauseForInteraction,{passive:true});document.addEventListener('touchstart',pauseForInteraction,{passive:true});document.addEventListener('wheel',()=>{if(autoScroller.running)autoScroller.pause()},{passive:true});document.addEventListener('keydown',event=>{if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)&&autoScroller.running)autoScroller.pause()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&autoScroller.running)autoScroller.pause()});
 
 function parseEventDate(){const date=String(content.date||'').trim(),time=/^\d{2}:\d{2}$/.test(content.eventStartTime||'')?content.eventStartTime:'00:00';eventDate=new Date(date+'T'+time+':00+08:00');const valid=!Number.isNaN(eventDate.getTime());content.dateDisplay=valid?new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Makassar'}).format(eventDate):'Tanggal akan diumumkan';$('#countdown').hidden=!valid;$('.date-badge').hidden=!valid;}
 
@@ -33,7 +45,7 @@ function renderVenueMaps(){for(const kind of ['ceremony','reception']){const fra
 function renderLinks(){renderVenueMaps();setLink("#ceremonyMaps",content.ceremonyMapsUrl||content.mapsUrl||venueMapsLink("ceremony"));setLink("#receptionMaps",content.receptionMapsUrl||content.mapsUrl||venueMapsLink("reception"));setLink("#childInstagram",content.childInstagramUrl);setLink("#familyInstagram",content.familyInstagramUrl);setLink("#whatsappLink",content.whatsappUrl);setLink("#instagramLink",content.instagramUrl);}
 function configureMusic(){$("#musicButton").title=content.musicTitle||"Musik Baptisan";const key=String(content.musicUrl||"").trim();if(key===musicKey)return;musicKey=key;music?.pause();music?.remove();music=null;youtubeFrame?.remove();youtubeFrame=null;musicPlaying=false;musicState(false);$("#musicButton").hidden=!key}
 function render(){
-  document.documentElement.dataset.theme=content.theme||"sky";parseEventDate();setText();document.title=`${content.childName} — Undangan Baptisan`;$("#receptionCard").hidden=content.showReception==="no";$("#guestName").textContent=guestFromLink;$("#rsvpName").value=guestFromLink==="Bapak/Ibu/Saudara/i"?"":guestFromLink;
+  document.documentElement.dataset.theme=content.theme||"sky";parseEventDate();setText();configureAutoScroll();document.title=`${content.childName} — Undangan Baptisan`;$("#receptionCard").hidden=content.showReception==="no";$("#guestName").textContent=guestFromLink;$("#rsvpName").value=guestFromLink==="Bapak/Ibu/Saudara/i"?"":guestFromLink;
   if(!Number.isNaN(eventDate.getTime())){const options={timeZone:'Asia/Makassar'};$("#eventMonth").textContent=eventDate.toLocaleDateString('id-ID',{...options,month:'short'}).replace('.','').toUpperCase();$("#eventDay").textContent=eventDate.toLocaleDateString('id-ID',{...options,day:'2-digit'});$("#eventYear").textContent=eventDate.toLocaleDateString('id-ID',{...options,year:'numeric'});}
   setBackground("#coverPhoto",content.coverImage);setBackground("#desktopPhoto",content.coverImage);setBackground("#heroSlideA",content.coverImage);setBackground("#closingPhoto",content.closingImage||content.coverImage);setImage("#childPhoto",content.childImage);setImage("#familyPhoto",content.familyImage);
   renderGallery(Array.isArray(content.gallery)?content.gallery:[]);renderTimeline();renderLinks();configureMusic();updateCountdown();clearInterval(countdownTimer);countdownTimer=setInterval(updateCountdown,1000);
@@ -65,11 +77,11 @@ function observeReveals(){preparePhotoEffects();const selector=".reveal,.photo-r
 function showToast(message){const toast=$("#toast");toast.textContent=message;toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2600)}
 async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("Berhasil disalin")}catch{const area=document.createElement("textarea");area.value=text;document.body.append(area);area.select();document.execCommand("copy");area.remove();showToast("Berhasil disalin")}}
 
-$("#openInvitation").onclick=()=>{invitationOpened=true;$("#cover").classList.add("opened");document.body.classList.remove("is-locked");$(".bottom-nav").classList.add("visible");$("#home").scrollIntoView({block:"start",behavior:"instant"});$("#cover").setAttribute("aria-hidden","true");$("#cover").inert=true;playMusic()};
+$("#openInvitation").onclick=()=>{invitationOpened=true;$("#cover").classList.add("opened");document.body.classList.remove("is-locked");$(".bottom-nav").classList.add("visible");$("#home").scrollIntoView({block:"start",behavior:"instant"});$("#cover").setAttribute("aria-hidden","true");$("#cover").inert=true;playMusic();configureAutoScroll();if(content.autoScrollEnabled!=="no"&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)autoScroller.start(1800)};
 $("#attendance").onchange=event=>{$("#guestCountWrap").hidden=event.target.value!=="hadir"};
 
 function setLightboxArrows(visible){$("#lightboxPrev").hidden=!visible;$("#lightboxNext").hidden=!visible}
-function showLightbox(url){url=safeImage(url);if(!url)return;$("#lightboxImage").src=url;$("#lightbox").hidden=false;document.body.classList.add("is-locked")}
+function showLightbox(url){if(autoScroller.running)autoScroller.pause();url=safeImage(url);if(!url)return;$("#lightboxImage").src=url;$("#lightbox").hidden=false;document.body.classList.add("is-locked")}
 function openLightbox(index){if(!currentGallery.length)return;lightboxIndex=(index+currentGallery.length)%currentGallery.length;setLightboxArrows(currentGallery.length>1);showLightbox(currentGallery[lightboxIndex])}
 function openSingleLightbox(url){lightboxIndex=-1;setLightboxArrows(false);showLightbox(url)}
 function closeLightbox(){$("#lightbox").hidden=true;$("#lightboxImage").removeAttribute("src");if(invitationOpened)document.body.classList.remove("is-locked")}

@@ -1,10 +1,11 @@
-import {defaults} from './defaults.js?v=polish-3';
+import {defaults} from './defaults.js?v=music-5';
 
 export function splitParents(value='') {
  const parts=String(value).split(/\s*(?:&|＆|\bdan\b)\s*/i).map(v=>v.trim()).filter(Boolean);
  return {fatherName:parts[0]||'',motherName:parts.slice(1).join(' & ')};
 }
 function completeBaptism(result,saved) {
+ if(saved.musicRelease!==defaults.musicRelease){result.musicUrl=defaults.musicUrl;result.musicTitle=defaults.musicTitle;result.musicRelease=defaults.musicRelease;}
  const legacy=splitParents(saved.parentsNames);
  result.fatherName=String(saved.fatherName||legacy.fatherName||defaults.fatherName).trim();
  result.motherName=String(saved.motherName||legacy.motherName||defaults.motherName).trim();

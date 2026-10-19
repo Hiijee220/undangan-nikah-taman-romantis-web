@@ -83,3 +83,20 @@ const hydrate=new Function('content','getImage','setBackground','setImage','star
 const hydration=hydrate({coverId:'cover',coverImage:'fallback',familyImageId:'family',gallery:[]},id=>id==='family'?stalled:Promise.resolve('cover-data'),(selector,url)=>painted.push([selector,url]),()=>{},()=>{},mapPhotos,()=>{},()=>{},()=>{});
 await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(painted[0],['#coverPhoto','cover-data']);releaseFamily('family-data');await hydration;
 console.log('PASS: cover paints independently; parallel requests capped at four; duplicate downloads avoided; repeat cache hits; failed cache and network recovery; photo order preserved.');
+
+const {createAutoScroller}=await import('./auto-scroll.mjs');
+let offset=0,callback=null,activeState=false;
+const scroller=createAutoScroller({position:()=>offset,limit:()=>100,move:value=>offset=value,request:fn=>{callback=fn;return 1},cancel:()=>callback=null,change:value=>activeState=value,speed:20});
+const frame=time=>{const fn=callback;callback=null;fn?.(time)};
+scroller.start(1800);assert.ok(scroller.running);frame(0);frame(1700);assert.equal(offset,0);frame(1800);frame(1850);assert.equal(offset,1);scroller.pause();assert.equal(callback,null);assert.equal(activeState,false);
+scroller.start();frame(2000);frame(12000);assert.equal(offset,2); // Background-tab gaps cannot jump the page.
+for(let time=12050;time<18000&&scroller.running;time+=50)frame(time);
+assert.equal(scroller.running,false);assert.ok(offset>=99&&offset<=100);
+const upgraded=baptismContent({contentType:'baptisan',musicUrl:'https://example.com/old.mp3'});assert.ok(upgraded.musicUrl.endsWith('/audio/mary-star-li.mp3'));assert.equal(upgraded.musicRelease,'mary-v1');
+const customized=baptismContent({contentType:'baptisan',musicRelease:'mary-v1',musicUrl:'https://example.com/new.mp3'});assert.equal(customized.musicUrl,'https://example.com/new.mp3');
+assert.throws(()=>cleanContent({...defaults,autoScrollSpeed:'invalid'}));
+assert.ok(html.includes('id="autoScrollButton"'));assert.ok(app.includes("document.addEventListener('visibilitychange'"));
+const groupsCode=admin.slice(admin.indexOf('const fieldGroups='),admin.indexOf('const imageSlots=')),fieldsCode=admin.slice(admin.indexOf('function renderFields()'),admin.indexOf('const imageUrl='));
+const target={innerHTML:''};new Function('data','$','esc',groupsCode+fieldsCode+';renderFields();')(defaults,()=>target,v=>String(v??''));
+assert.ok(target.innerHTML.includes('<select name="autoScrollSpeed">'));assert.ok(target.innerHTML.includes('value="slow"'));assert.ok(!target.innerHTML.includes('type="scroll-speed"'));
+console.log('PASS: automatic scroll delay, pause, speed and page-end stop; no jump after tab gaps; music upgrade and later admin overrides; generated speed controls.');

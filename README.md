@@ -19,3 +19,7 @@ Nama ayah/ibu disimpan dalam field terpisah dan ditampilkan rata tengah dengan a
 ## Pemuatan foto
 
 Sampul diprioritaskan dan langsung tampil saat selesai, tanpa menunggu foto keluarga. Bagian lain tampil progresif. Loader bersama membatasi unduhan menjadi empat sekaligus, menggabungkan permintaan ID yang sama, dan menyimpan hingga 40 foto di IndexedDB. Kegagalan cache tidak menghentikan foto online. Foto unggahan baru memakai ID unik sehingga versi baru tidak tertukar dengan cache.
+
+## Musik dan gulir otomatis
+
+File musik kiriman pengguna dipasang utuh di `audio/mary-star-li.mp3` (sekitar 60 detik), diputar berulang setelah tombol Buka Undangan ditekan. Rilis musik mengganti konfigurasi sebelumnya sekali saat dibaca; perubahan musik berikutnya dari admin tetap dihormati. Gulir otomatis mulai sesudah transisi, dapat dijeda/dilanjutkan, berhenti saat interaksi, pindah tab, membuka foto, atau mencapai akhir halaman. Admin dapat menonaktifkan mulai otomatis dan memilih kecepatan. Perangkat dengan reduced motion tidak mulai menggulir sendiri.
