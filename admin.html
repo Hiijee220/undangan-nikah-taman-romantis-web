@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Admin — Taman Romantis</title><meta name="robots" content="noindex">
-  <link rel="stylesheet" href="style.css?v=firebase-1">
+  <title>Admin — Undangan Baptisan</title><meta name="robots" content="noindex">
+  <link rel="stylesheet" href="style.css?v=baptisan-1">
 </head>
 <body class="admin-shell">
-  <header class="admin-head"><div><h1>Admin Undangan</h1><small id="user">Silakan masuk</small></div><a href="index.html" target="_blank" rel="noopener">Lihat website ↗</a></header>
+  <header class="admin-head"><div><h1>Admin Baptisan</h1><small id="user">Silakan masuk</small></div><a href="index.html" target="_blank" rel="noopener">Lihat website ↗</a></header>
   <main class="admin-wrap">
     <section id="login" class="admin-card login-card">
-      <h2>Login Admin</h2><p>Gunakan akun Google. Jika login dibuka melalui WhatsApp atau iPhone dan gagal, gunakan email dan password.</p>
+      <h2>Kelola Undangan Baptisan</h2><p>Gunakan akun Google. Jika login dibuka melalui WhatsApp atau iPhone dan gagal, gunakan email dan password.</p>
       <button id="loginBtn" class="admin-button" type="button">Masuk dengan Google</button>
       <div class="login-divider"><span>atau</span></div>
       <form id="emailLoginForm" class="email-login-form"><label>Email admin<input id="adminEmail" value="remajasilo.rs@gmail.com" type="email" autocomplete="username" required></label><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required></label><button class="admin-button field-wide" type="submit">Masuk dengan Email</button></form>
@@ -21,7 +21,7 @@
       <section class="admin-card"><h2>Link Nama Tamu</h2><p>Masukkan nama tamu, lalu salin link khusus untuk dikirim melalui WhatsApp.</p><div class="guest-link-row"><input id="guestNameInput" placeholder="Contoh: Keluarga Bapak Silo"><button id="copyGuestLink" class="admin-button" type="button">Salin Link Tamu</button></div></section>
       <form id="contentForm">
         <section class="admin-card"><h2>Tema Undangan</h2><p>Pilih tema warna yang akan digunakan di seluruh halaman.</p><label>Pilih tema<select id="theme"><option value="sky">Biru Langit</option><option value="forest">Forest Gold</option><option value="rose">Rose Romance</option><option value="navy">Navy Elegant</option><option value="sage">Sage Natural</option><option value="terracotta">Terracotta</option></select></label><div class="theme-swatches"><i class="sky"></i><i class="forest"></i><i class="rose"></i><i class="navy"></i><i class="sage"></i><i class="terracotta"></i></div></section>
-        <section class="admin-card"><h2>Semua Isi Undangan</h2><p>Semua tulisan, link, tanggal, acara, hadiah, RSVP, sosial media, dan musik dapat diubah di bawah ini.</p><div id="fields"></div></section>
+        <section class="admin-card"><h2>Data Baptisan Anak</h2><p>Isi nama anak, orang tua, wali baptis, gereja, jadwal baptisan dan syukuran, foto, musik, rekening, serta tulisan undangan. Data contoh dapat Anda ganti kapan saja.</p><div id="fields"></div></section>
         <section class="admin-card"><h2>Foto Undangan</h2><p class="helper">Maksimal 10 MB per foto. Foto otomatis dikompres agar website tetap cepat. Untuk hasil terbaik gunakan foto vertikal.</p><div class="upload-grid" id="imageSlots"></div></section>
         <section class="admin-card"><h2>Foto Slideshow Pembuka</h2><p class="helper">Maksimal 4 foto. Foto akan berganti otomatis pada bagian awal undangan.</p><input id="openingUpload" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple><div id="openingThumbs" class="thumbs"></div></section>
         <section class="admin-card"><h2>Galeri Foto</h2><p class="helper">Maksimal 10 foto galeri. Tamu dapat menekan foto untuk melihat ukuran besar.</p><input id="galleryUpload" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple><div id="galleryThumbs" class="thumbs"></div></section>
@@ -29,6 +29,6 @@
       </form>
     </div>
   </main>
-  <script type="module" src="admin.js?v=firebase-1"></script>
+  <script type="module" src="admin.js?v=baptisan-1"></script>
 </body>
 </html>

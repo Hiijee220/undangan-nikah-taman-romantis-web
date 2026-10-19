@@ -21,10 +21,10 @@ assert.throws(()=>cleanRsvp({name:'',message:'',attendance:'hadir',guestCount:0}
 assert.throws(()=>cleanRsvp({name:'Tamu',message:'Selamat',attendance:'hadir',guestCount:5}));
 let stored=null,writes=0;
 const runner=async action=>action({get:async()=>({exists:()=>!!stored,data:()=>stored}),set:(_,value)=>{stored=value;writes++}});
-assert.equal(await saveContent('content',0,{groom:'A'},runner),1);
-assert.equal(await saveContent('content',1,{groom:'B'},runner),2);
-await assert.rejects(saveContent('content',1,{groom:'Stale'},runner),/sesi lain/);
-assert.equal(stored.groom,'B');assert.equal(writes,2);
+assert.equal(await saveContent('content',0,{childName:'A'},runner),1);
+assert.equal(await saveContent('content',1,{childName:'B'},runner),2);
+await assert.rejects(saveContent('content',1,{childName:'Stale'},runner),/sesi lain/);
+assert.equal(stored.childName,'B');assert.equal(writes,2);
 const app=await readFile('app.js','utf8'),admin=await readFile('admin.js','utf8'),html=await readFile('index.html','utf8'),adminHtml=await readFile('admin.html','utf8'),firebase=await readFile('firebase.js','utf8');
 assert.ok(app.includes('/invitationTamanRomantis/'));assert.ok(app.includes('/invitationTamanRomantisResponses'));
 for(const source of [app,admin,firebase]){
@@ -33,7 +33,7 @@ for(const source of [app,admin,firebase]){
  assert.ok(!source.includes('api.github.com'));
  assert.ok(!source.includes('chatgpt.site'));
 }
-for(const id of ['openInvitation','countdown','groomPhoto','bridePhoto','ceremonyMaps','receptionMaps','gallery','timeline','toggleGift','copyAccount','giftWhatsapp','rsvpForm','wishes','lightbox','musicButton'])assert.ok(html.includes('id="'+id+'"'),id);
+for(const id of ['openInvitation','countdown','childPhoto','familyPhoto','ceremonyMaps','receptionMaps','gallery','timeline','toggleGift','copyAccount','giftWhatsapp','rsvpForm','wishes','lightbox','musicButton'])assert.ok(html.includes('id="'+id+'"'),id);
 for(const id of ['loginBtn','emailLoginForm','resetPasswordBtn','copyGuestLink','theme','imageSlots','openingUpload','galleryUpload','contentForm','logoutBtn'])assert.ok(adminHtml.includes('id="'+id+'"'),id);
 assert.equal((adminHtml.match(/<option value="(sky|forest|rose|navy|sage|terracotta)"/g)||[]).length,6);
 for(const match of html.matchAll(/data-k="([^"]+)"/g))assert.ok(match[1] in defaults||match[1]==='dateDisplay',match[1]);
@@ -43,3 +43,11 @@ assert.ok(rules.includes('request.auth.token.email_verified == true'));
 assert.ok(rules.includes("request.resource.data.keys().hasOnly(['name','message','attendance','guestCount','createdAt'])"));
 assert.ok(!rules.includes('match /{document=**}'));
 console.log('PASS: JS syntax; all reference sections/themes; namespace isolation; safe links/photos; RSVP validation; preserved revision conflicts; admin/rule consistency.');
+
+const {baptismContent}=await import('./content.mjs');
+const legacy=baptismContent({groom:'Old',story:'Wedding',ceremonyTitle:'Akad',theme:'rose',revision:5,coverId:'cover-old'});
+assert.equal(legacy.contentType,'baptisan');assert.equal(legacy.childName,'Nama Anak');assert.equal(legacy.ceremonyTitle,'Ibadah Baptisan');assert.equal(legacy.theme,'rose');assert.equal(legacy.coverId,'cover-old');assert.equal(legacy.revision,5);
+assert.equal(baptismContent({contentType:'baptisan',childName:'Joel'}).childName,'Joel');
+assert.ok(admin.includes('["showReception","Tampilkan syukuran","select"]'));
+assert.ok(html.includes('id="receptionCard"'));
+console.log('PASS: baptism migration, editable child/family fields and optional thanksgiving.');
