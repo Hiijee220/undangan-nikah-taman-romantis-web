@@ -63,3 +63,23 @@ assert.equal(baptismContent({contentType:'baptisan',journey2Text:'Cerita pribadi
 assert.equal(baptismContent({contentType:'baptisan',parentsNames:'Lama & Lama',fatherName:'Baru',motherName:'Ibu Baru'}).fatherName,'Baru');
 assert.ok(!admin.includes('Menu Hadiah'));assert.ok(!admin.includes('Hadiah & Rekening'));assert.ok(!admin.includes('Konfirmasi Hadiah'));assert.ok(!html.includes('id="gift"'));assert.ok(!app.includes('$("#toggleGift")'));assert.ok(!admin.includes('["closingImageId","Foto penutup"'));
 console.log('PASS: centered split parent names; populated blank stories preserving custom text/photos/revision; gift removed from public/admin.');
+
+const {createPhotoLoader,mapPhotos}=await import('./photo-cache.mjs');
+let calls=0,active=0,peak=0;const savedPhotos=new Map();
+const loader=createPhotoLoader(async id=>{calls++;active++;peak=Math.max(peak,active);await new Promise(resolve=>setTimeout(resolve,5));active--;return `photo-${id}`},{read:id=>savedPhotos.get(id)||'',write:(id,url)=>savedPhotos.set(id,url)});
+assert.deepEqual(await Promise.all([loader('one'),loader('one')]),['photo-one','photo-one']);assert.equal(calls,1);
+await Promise.all(Array.from({length:12},(_,i)=>loader('id-'+i)));assert.equal(peak,4);
+let repeatCalls=0;const repeat=createPhotoLoader(async()=>{repeatCalls++;return 'network'},{read:id=>savedPhotos.get(id)||'',write:()=>{}});
+assert.equal(await repeat('one'),'photo-one');assert.equal(repeatCalls,0);
+const blocked=createPhotoLoader(async()=> 'online-photo',{read:()=>{throw Error('blocked')},write:()=>{throw Error('quota')}});
+assert.equal(await blocked('online'),'online-photo');
+let tries=0;const retry=createPhotoLoader(async()=>{if(++tries===1)throw Error('offline');return 'recovered'},{read:()=>'',write:()=>{}});
+assert.equal(await retry('same','fallback'),'fallback');assert.equal(await retry('same','fallback'),'recovered');
+assert.deepEqual(await mapPhotos([3,1,2],async n=>n*2),[6,2,4]);
+// A stalled family photo cannot delay the already downloaded cover.
+const hydrateCode=app.slice(app.indexOf('async function hydrateImages(){'),app.indexOf('function startHero'));
+let releaseFamily;const stalled=new Promise(resolve=>releaseFamily=resolve),painted=[];
+const hydrate=new Function('content','getImage','setBackground','setImage','startHero','mapPhotos','renderGallery','renderTimeline','observeReveals',hydrateCode+';return hydrateImages();');
+const hydration=hydrate({coverId:'cover',coverImage:'fallback',familyImageId:'family',gallery:[]},id=>id==='family'?stalled:Promise.resolve('cover-data'),(selector,url)=>painted.push([selector,url]),()=>{},()=>{},mapPhotos,()=>{},()=>{},()=>{});
+await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(painted[0],['#coverPhoto','cover-data']);releaseFamily('family-data');await hydration;
+console.log('PASS: cover paints independently; parallel requests capped at four; duplicate downloads avoided; repeat cache hits; failed cache and network recovery; photo order preserved.');

@@ -15,3 +15,7 @@ Tema biru pastel dengan latar awan, bintang, balon udara, malaikat kecil, bingka
 ## Pengaturan terbaru
 
 Nama ayah/ibu disimpan dalam field terpisah dan ditampilkan rata tengah dengan ampersand pada baris tersendiri. Data gabungan lama otomatis dipisah saat dibaca. Cerita kosong memakai narasi doa/syukur bawaan tanpa mengubah cerita pribadi yang sudah diisi. Form admin memuat hasilnya dan menyimpannya saat pengguna menekan Simpan. Hadiah/rekening dan pengaturan yang tidak dipakai di halaman publik dihapus dari antarmuka. Foto memakai animasi zoom perlahan dengan dukungan reduced motion.
+
+## Pemuatan foto
+
+Sampul diprioritaskan dan langsung tampil saat selesai, tanpa menunggu foto keluarga. Bagian lain tampil progresif. Loader bersama membatasi unduhan menjadi empat sekaligus, menggabungkan permintaan ID yang sama, dan menyimpan hingga 40 foto di IndexedDB. Kegagalan cache tidak menghentikan foto online. Foto unggahan baru memakai ID unik sehingga versi baru tidak tertukar dengan cache.

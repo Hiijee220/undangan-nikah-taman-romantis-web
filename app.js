@@ -6,13 +6,14 @@ import {defaults as fallback} from './defaults.js?v=polish-3';
 import {baptismContent} from './content.mjs?v=polish-3';
 import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=polish-3';
 
+import {createPhotoLoader,mapPhotos} from './photo-cache.mjs?v=photos-4';
+
 const $=selector=>document.querySelector(selector);
 const safe=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 function decodeValue(value={}){if("stringValue"in value)return value.stringValue;if("timestampValue"in value)return value.timestampValue;if("booleanValue"in value)return value.booleanValue;if("integerValue"in value)return Number(value.integerValue);if("doubleValue"in value)return value.doubleValue;if("arrayValue"in value)return(value.arrayValue.values||[]).map(decodeValue);if("mapValue"in value)return decodeFields(value.mapValue.fields||{});return null}
 function decodeFields(fields={}){return Object.fromEntries(Object.entries(fields).map(([key,value])=>[key,decodeValue(value)]))}
 async function getDocument(id){const response=await fetch(`${INVITATION_ROOT}${encodeURIComponent(id)}`,{cache:"no-store"});if(!response.ok)throw new Error(`Data ${id} tidak tersedia`);return decodeFields((await response.json()).fields||{})}
-const imageCache=new Map(),wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
-async function getImage(id,backup=""){if(!id)return backup;let request=imageCache.get(id);if(!request){request=(async()=>{let lastError;for(let attempt=0;attempt<3;attempt++){try{return safeImage((await getDocument(id)).dataUrl)||""}catch(error){lastError=error;if(attempt<2)await wait(300*(attempt+1))}}throw lastError})();imageCache.set(id,request)}try{return(await request)||backup}catch(error){imageCache.delete(id);console.warn(`Foto ${id} gagal dimuat.`,error);return backup}}
+const getImage=createPhotoLoader(async id=>(await getDocument(id)).dataUrl,{valid:safeImage});
 async function loadContent(){try{return baptismContent(await getDocument("content"))}catch(error){console.info("Data online belum tersedia, memakai data cadangan.",error.message);return{...fallback}}}
 
 let content={...fallback},eventDate=new Date(),countdownTimer=null,heroTimer=null,currentGallery=[],lightboxIndex=0,music=null,youtubeFrame=null,musicPlaying=false,musicKey="",invitationOpened=false;
@@ -39,12 +40,18 @@ function render(){
 }
 
 async function hydrateImages(){
-  const coverId=content.coverId||content.heroId||"hero";
-  const [cover,childName,familyName,closing]=await Promise.all([getImage(coverId,content.coverImage),getImage(content.childImageId||content.coupleId||"couple",content.childImage),getImage(content.familyImageId||content.coupleId||"couple",content.familyImage),getImage(content.closingImageId||coverId,content.closingImage||content.coverImage)]);
-  content.coverImage=cover;content.childImage=childName;content.familyImage=familyName;content.closingImage=closing;setBackground("#coverPhoto",cover);setBackground("#desktopPhoto",cover);setBackground("#closingPhoto",closing);setImage("#childPhoto",childName);setImage("#familyPhoto",familyName);if(!content.galleryIds?.length&&!content.gallery?.length)renderGallery([]);
-  const openingIds=Array.isArray(content.openingIds)&&content.openingIds.length?content.openingIds:[coverId];const openingImages=(await Promise.all(openingIds.slice(0,4).map(id=>getImage(id)))).filter(Boolean);startHero(openingImages.length?openingImages:[cover]);
-  const galleryIds=Array.isArray(content.galleryIds)?content.galleryIds:[];if(galleryIds.length){const urls=(await Promise.all(galleryIds.map(id=>getImage(id)))).filter(Boolean);if(urls.length)renderGallery(urls)}
-  const storyIds=[content.story1ImageId,content.story2ImageId,content.story3ImageId];const storyImages=await Promise.all(storyIds.map((id,index)=>getImage(id,currentGallery[index]||content.gallery[index]||cover)));renderTimeline(storyImages);
+  const coverId=content.coverId||content.heroId||'hero';
+  // Fetch and display the first-screen photo before requesting the rest.
+  const cover=await getImage(coverId,content.coverImage);
+  content.coverImage=cover;setBackground('#coverPhoto',cover);startHero([cover]);
+  const tasks=[
+    getImage(content.childImageId||content.coupleId,content.childImage).then(url=>{content.childImage=url;setImage('#childPhoto',url);if(!content.galleryIds?.length&&!content.gallery?.length)renderGallery([])}),
+    getImage(content.familyImageId||content.coupleId,content.familyImage).then(url=>{content.familyImage=url;setImage('#familyPhoto',url)}),
+    (async()=>{const ids=content.openingIds?.length?content.openingIds.slice(0,4):[coverId];const images=(await mapPhotos(ids,id=>getImage(id))).filter(Boolean);if(images.length)startHero(images)})(),
+    (async()=>{const ids=Array.isArray(content.galleryIds)?content.galleryIds:[];if(!ids.length)return;const urls=new Array(ids.length);await mapPhotos(ids,async(id,index)=>{urls[index]=await getImage(id);renderGallery(urls.filter(Boolean));observeReveals()})})(),
+    (async()=>{const ids=[content.story1ImageId,content.story2ImageId,content.story3ImageId],images=new Array(3);await mapPhotos(ids,async(id,index)=>{images[index]=await getImage(id,content.gallery[index]||cover);renderTimeline(images)})})()
+  ];
+  await Promise.all(tasks);observeReveals();
 }
 function startHero(images){clearInterval(heroTimer);if(!images.length)return;const a=$("#heroSlideA"),b=$("#heroSlideB");let index=0,front=a,back=b;setBackground("#heroSlideA",images[0]);a.classList.add("active");b.classList.remove("active");if(images.length<2)return;heroTimer=setInterval(()=>{index=(index+1)%images.length;setBackground(`#${back.id}`,images[index]);back.classList.add("active");front.classList.remove("active");[front,back]=[back,front]},5000)}
 
