@@ -47,3 +47,16 @@ html[data-theme="sky"]{--primary:#568fb2;--primary-rgb:86,143,178;--soft:#e1effb
 @media(prefers-reduced-motion:reduce){.balloon,.angel,.baptism-design .cover-content{animation:none!important}.baptism-design .cover{transition:none!important}}
 
 body.baptism-design{background:#c1dced}.baptism-design .desktop-scene:after{display:none}@media(min-width:900px){.baptism-design .cover{width:520px;left:auto;right:0}}
+
+/* Equal centered columns in a vertical stack keep long names and degrees balanced. */
+.baptism-design .person-card h3.parents-names{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:7px;max-width:430px;margin:12px auto 20px;font-size:clamp(31px,8.2vw,40px);line-height:1.42;text-align:center}
+.parents-names .parent-name{display:block;width:100%;text-wrap:balance;overflow-wrap:normal;word-break:normal;padding:0 5px}
+.parents-names .parents-amp{display:block;color:var(--accent);font:italic 29px/1 'Cormorant Garamond',serif;margin:3px 0}
+/* Move the photograph within its fixed frame, keeping page layout steady. */
+.baptism-design .cover-photo{animation:portraitBreathe 13s ease-in-out infinite alternate;transform-origin:50% 45%}
+.baptism-design .hero .hero-slide.active{animation:portraitBreathe 14s ease-in-out infinite alternate;transform-origin:50% 45%}
+.baptism-design .person-photo img{animation:portraitBreathe 14s ease-in-out infinite alternate;transform-origin:50% 45%}
+.baptism-design .story-photo{animation:portraitBreathe 17s ease-in-out infinite alternate;transform-origin:center}
+.baptism-design .gallery-item.photo-pop.visible img{animation:portraitBreathe 16s ease-in-out infinite alternate;transform-origin:center}
+@keyframes portraitBreathe{from{transform:scale(1.015) translateY(0)}to{transform:scale(1.065) translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){.baptism-design .cover-photo,.baptism-design .hero .hero-slide.active,.baptism-design .person-photo img,.baptism-design .story-photo,.baptism-design .gallery-item.photo-pop.visible img{animation:none!important;transform:none!important}}

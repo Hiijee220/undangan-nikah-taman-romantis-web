@@ -33,7 +33,7 @@ for(const source of [app,admin,firebase]){
  assert.ok(!source.includes('api.github.com'));
  assert.ok(!source.includes('chatgpt.site'));
 }
-for(const id of ['openInvitation','countdown','childPhoto','familyPhoto','ceremonyMaps','receptionMaps','gallery','timeline','toggleGift','copyAccount','giftWhatsapp','rsvpForm','wishes','lightbox','musicButton'])assert.ok(html.includes('id="'+id+'"'),id);
+for(const id of ['openInvitation','countdown','childPhoto','familyPhoto','ceremonyMaps','receptionMaps','gallery','timeline','rsvpForm','wishes','lightbox','musicButton'])assert.ok(html.includes('id="'+id+'"'),id);
 for(const id of ['loginBtn','emailLoginForm','resetPasswordBtn','copyGuestLink','theme','imageSlots','openingUpload','galleryUpload','contentForm','logoutBtn'])assert.ok(adminHtml.includes('id="'+id+'"'),id);
 assert.equal((adminHtml.match(/<option value="(sky|forest|rose|navy|sage|terracotta)"/g)||[]).length,6);
 for(const match of html.matchAll(/data-k="([^"]+)"/g))assert.ok(match[1] in defaults||match[1]==='dateDisplay',match[1]);
@@ -54,3 +54,12 @@ console.log('PASS: baptism migration, editable child/family fields and optional 
 
 assert.equal(safeImage('./baby-placeholder.svg'),'./baby-placeholder.svg');
 assert.ok(html.includes('ceremonyMapFrame'));assert.ok(html.includes('baptism.css'));
+
+const parents=await import('./content.mjs');
+assert.deepEqual(parents.splitParents('Jeivan S. Momongan S.Kom&Charine G. Berentian S.Ak'),{fatherName:'Jeivan S. Momongan S.Kom',motherName:'Charine G. Berentian S.Ak'});
+const filled=baptismContent({contentType:'baptisan',parentsNames:'Ayah & Ibu',journey2Text:'  ',journey3Text:'',revision:18,coverId:'cover-saved'});
+assert.equal(filled.fatherName,'Ayah');assert.equal(filled.motherName,'Ibu');assert.ok(filled.journey2Text.length>100);assert.ok(filled.journey3Text.length>100);assert.equal(filled.revision,18);assert.equal(filled.coverId,'cover-saved');
+assert.equal(baptismContent({contentType:'baptisan',journey2Text:'Cerita pribadi'}).journey2Text,'Cerita pribadi');
+assert.equal(baptismContent({contentType:'baptisan',parentsNames:'Lama & Lama',fatherName:'Baru',motherName:'Ibu Baru'}).fatherName,'Baru');
+assert.ok(!admin.includes('Menu Hadiah'));assert.ok(!admin.includes('Hadiah & Rekening'));assert.ok(!admin.includes('Konfirmasi Hadiah'));assert.ok(!html.includes('id="gift"'));assert.ok(!app.includes('$("#toggleGift")'));assert.ok(!admin.includes('["closingImageId","Foto penutup"'));
+console.log('PASS: centered split parent names; populated blank stories preserving custom text/photos/revision; gift removed from public/admin.');

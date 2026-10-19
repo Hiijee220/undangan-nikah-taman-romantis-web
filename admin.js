@@ -1,16 +1,16 @@
 import{auth,db,CONTENT_COLLECTION,ADMIN_EMAIL}from"./firebase.js";
-import{defaults}from"./defaults.js?v=sky-2";
-import {baptismContent} from "./content.mjs?v=sky-2";
+import{defaults}from"./defaults.js?v=polish-3";
+import {baptismContent} from "./content.mjs?v=polish-3";
 import{saveContent}from"./persistence.mjs";
-import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=sky-2";
+import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=polish-3";
 import{GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import{doc,getDoc,setDoc,runTransaction}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 const fieldGroups=[
-  ["Sampul & Nama Tamu",[["childName","Nama panggilan anak"],["familyName","Nama keluarga"],["initials","Inisial atau simbol sampul"],["baptismLabel","Judul sampul baptisan"],["guestHeading","Sapaan tamu"],["guestNote","Catatan nama tamu","textarea"],["openButtonText","Tulisan tombol buka"]]],
+  ["Sampul & Nama Tamu",[["childName","Nama panggilan anak"],["initials","Inisial atau simbol sampul"],["baptismLabel","Judul sampul baptisan"],["guestHeading","Sapaan tamu"],["guestNote","Catatan nama tamu","textarea"],["openButtonText","Tulisan tombol buka"]]],
   ["Ayat Alkitab",[["greeting","Isi ayat pembuka","textarea"],["verseReference","Sumber ayat pembuka"],["secondVerse","Isi ayat kedua","textarea"],["secondVerseReference","Sumber ayat kedua"]]],
   ["Profil Anak",[["childRole","Label profil anak"],["childFullName","Nama lengkap anak"],["childDescription","Keterangan anak / tanggal lahir","textarea"],["childInstagramLabel","Tulisan Instagram anak / keluarga"],["childInstagramUrl","Link Instagram anak / keluarga","url"]]],
-  ["Orang Tua & Wali Baptis",[["familyRole","Label orang tua"],["parentsNames","Nama ayah dan ibu"],["godparentsNames","Nama wali baptis (boleh kosong)","textarea"],["familyInstagramLabel","Tulisan Instagram keluarga"],["familyInstagramUrl","Link Instagram keluarga","url"]]],
+  ["Orang Tua & Wali Baptis",[["familyRole","Label orang tua"],["fatherName","Nama ayah (beserta gelar)"],["motherName","Nama ibu (beserta gelar)"],["godparentsNames","Nama wali baptis (boleh kosong)","textarea"],["familyInstagramLabel","Tulisan Instagram keluarga"],["familyInstagramUrl","Link Instagram keluarga","url"]]],
   ["Pengantar Baptisan",[["childLabel","Label bagian anak"],["childTitle","Judul profil anak"],["story","Kalimat undangan","textarea"]]],
   ["Tanggal Utama",[["eventLabel","Tulisan Save the date"],["eventTitle","Judul bagian acara"],["date","Tanggal baptisan","date"],["eventStartTime","Jam mulai untuk hitung mundur","time"],["mapsButtonText","Tulisan tombol Maps"]]],
   ["Ibadah Baptisan",[["ceremonyTitle","Nama acara"],["ceremonyTime","Waktu baptisan"],["ceremonyVenue","Nama tempat baptisan"],["ceremonyAddress","Alamat baptisan","textarea"],["ceremonyMapsUrl","Link Google Maps baptisan","url"]]],
@@ -20,17 +20,15 @@ const fieldGroups=[
   ["Cerita 2",[["journey2Year","Tahun / tanggal cerita 2"],["journey2Title","Judul cerita 2"],["journey2Text","Isi cerita 2","textarea"]]],
   ["Cerita 3",[["journey3Year","Tahun / tanggal cerita 3"],["journey3Title","Judul cerita 3"],["journey3Text","Isi cerita 3","textarea"]]],
   ["Judul Cerita",[["journeyLabel","Tulisan Our Story"],["journeyTitle","Judul bagian cerita"]]],
-  ["Hadiah & Rekening",[["giftLabel","Label tanda kasih"],["giftTitle","Judul hadiah"],["giftText","Pesan hadiah","textarea"],["showAccountText","Tombol lihat rekening"],["hideAccountText","Tombol sembunyikan rekening"],["bankName","Nama bank"],["accountNumber","Nomor rekening"],["accountPrefix","Awalan pemilik (a.n.)"],["accountHolder","Nama pemilik rekening"],["copyAccountText","Tulisan salin rekening"]]],
-  ["Konfirmasi Hadiah",[["giftConfirmationText","Tulisan tombol konfirmasi"],["giftWhatsappNumber","Nomor WhatsApp (awali 62)"],["giftWhatsappMessage","Pesan WhatsApp hadiah","textarea"]]],
   ["Ucapan & RSVP",[["rsvpLabel","Tulisan Ucapan & RSVP"],["rsvpTitle","Judul RSVP"],["rsvpText","Penjelasan RSVP","textarea"],["rsvpButtonText","Tulisan tombol kirim"]]],
   ["Musik",[["musicTitle","Judul musik"],["musicUrl","Link MP3, OGG, YouTube, atau Google Drive","url"]]],
   ["Penutup & Sosial Media",[["closingLabel","Tulisan penutup"],["footerText","Ucapan terima kasih","textarea"],["closingCredit","Tulisan kecil paling bawah"],["whatsappUrl","Link WhatsApp","url"],["instagramUrl","Link Instagram","url"]]],
-  ["Menu & Hitung Mundur",[["navHome","Menu Home"],["navChild","Menu Anak"],["navEvent","Menu Acara"],["navGallery","Menu Galeri"],["navGift","Menu Hadiah"],["countdownDay","Label hari"],["countdownHour","Label jam"],["countdownMinute","Label menit"],["countdownSecond","Label detik"]]]
+  ["Menu & Hitung Mundur",[["navHome","Menu Home"],["navChild","Menu Anak"],["navEvent","Menu Acara"],["navGallery","Menu Galeri"],["navRsvp","Menu Ucapan"],["countdownDay","Label hari"],["countdownHour","Label jam"],["countdownMinute","Label menit"],["countdownSecond","Label detik"]]]
 ];
 
 
 const imageSlots=[
-  ["coverId","Foto sampul utama","hero"],["childImageId","Foto anak","childName"],["familyImageId","Foto keluarga","familyName"],["story1ImageId","Foto cerita 1","story-1"],["story2ImageId","Foto cerita 2","story-2"],["story3ImageId","Foto cerita 3","story-3"],["closingImageId","Foto penutup","closing"]
+  ["coverId","Foto sampul utama","hero"],["childImageId","Foto anak","childName"],["familyImageId","Foto keluarga","familyName"],["story1ImageId","Foto cerita 1","story-1"],["story2ImageId","Foto cerita 2","story-2"],["story3ImageId","Foto cerita 3","story-3"]
 ];
 
 let data={...defaults};const $=selector=>document.querySelector(selector);

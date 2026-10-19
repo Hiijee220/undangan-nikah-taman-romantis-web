@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css?v=baptisan-1">
-  <link rel="stylesheet" href="baptism.css?v=sky-2">
+  <link rel="stylesheet" href="baptism.css?v=polish-3">
 </head>
 <body class="is-locked baptism-design">
   <div class="page-loader" id="pageLoader" aria-hidden="true"><span data-k="initials">✝</span></div>
@@ -55,7 +55,7 @@
       <header class="section-heading reveal"><p class="overline accent" data-k="childLabel">Anak Terkasih</p><h2 data-k="childTitle">Sukacita Baptisan</h2><p data-k="story">Dengan penuh syukur kepada Tuhan, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam baptisan anak terkasih kami.</p></header>
       <article class="person-card reveal"><div class="portrait-scene child-portrait"><div class="person-photo"><img id="childPhoto" alt="Foto anak" loading="lazy"></div><img class="balloon balloon-left" src="balloon.svg" alt=""><img class="balloon balloon-right" src="balloon.svg" alt=""><span class="cloud-puff" aria-hidden="true"></span></div><p class="person-role" data-k="childRole">Yang akan dibaptis</p><h3 data-k="childFullName">[Nama lengkap anak]</h3><p data-k="childDescription">Anak terkasih kami</p><a id="childInstagram" class="social-link" target="_blank" rel="noopener">◎ <span data-k="childInstagramLabel">Instagram keluarga</span></a></article>
       <div class="couple-and" aria-hidden="true">✝</div>
-      <article class="person-card reveal"><div class="person-photo"><img id="familyPhoto" alt="Foto keluarga" loading="lazy"></div><p class="person-role" data-k="familyRole">Orang Tua &amp; Wali Baptis</p><h3 data-k="parentsNames">[Nama ayah] &amp; [Nama ibu]</h3><p data-k="godparentsNames"></p><a id="familyInstagram" class="social-link" target="_blank" rel="noopener">◎ <span data-k="familyInstagramLabel">Instagram keluarga</span></a></article>
+      <article class="person-card reveal"><div class="person-photo"><img id="familyPhoto" alt="Foto keluarga" loading="lazy"></div><p class="person-role" data-k="familyRole">Orang Tua &amp; Wali Baptis</p><h3 class="parents-names"><span class="parent-name" data-k="fatherName">[Nama ayah]</span><span class="parents-amp" aria-label="dan">&amp;</span><span class="parent-name" data-k="motherName">[Nama ibu]</span></h3><p data-k="godparentsNames"></p><a id="familyInstagram" class="social-link" target="_blank" rel="noopener">◎ <span data-k="familyInstagramLabel">Instagram keluarga</span></a></article>
     </section>
 
     <section class="secondary-verse panel"><div class="ornament">❦</div><blockquote data-k="secondVerse">Dengan penuh syukur, kami menyerahkan anak terkasih dalam kasih dan penyertaan Tuhan.</blockquote><p data-k="secondVerseReference"></p></section>
@@ -71,13 +71,7 @@
 
     <section class="story-section panel" id="story"><header class="section-heading reveal"><p class="overline accent" data-k="journeyLabel">Little Blessings</p><h2 data-k="journeyTitle">Cerita Si Kecil</h2></header><div class="timeline" id="timeline"></div></section>
 
-    <section class="gift-section panel" id="gift">
-      <header class="section-heading reveal"><p class="overline" data-k="giftLabel">Tanda Kasih</p><h2 data-k="giftTitle">Tanda Kasih</h2><p data-k="giftText">Doa restu Anda adalah hadiah terindah. Apabila ingin mengirimkan tanda kasih, Anda dapat menggunakan rekening berikut.</p></header>
-      <button class="outline-button light" id="toggleGift" type="button" data-k="showAccountText">Lihat Rekening</button>
-      <div class="gift-details" id="giftDetails" hidden><div class="bank-card"><div class="bank-chip"></div><span data-k="bankName"></span><strong data-k="accountNumber"></strong><small><span data-k="accountPrefix">a.n.</span> <span data-k="accountHolder"></span></small><button id="copyAccount" type="button">⧉ <span data-k="copyAccountText">Salin Rekening</span></button></div><a class="outline-button light" id="giftWhatsapp" target="_blank" rel="noopener">◉ <span data-k="giftConfirmationText">Konfirmasi Hadiah</span></a></div>
-    </section>
-
-    <section class="rsvp-section panel" id="rsvp">
+<section class="rsvp-section panel" id="rsvp">
       <header class="section-heading reveal"><p class="overline accent" data-k="rsvpLabel">Ucapan &amp; RSVP</p><h2 data-k="rsvpTitle">Doa dan Kehadiran</h2><p data-k="rsvpText">Tuliskan ucapan dan konfirmasi kehadiran Anda.</p></header>
       <div class="attendance-stats" id="attendanceStats"><span><b id="attendingCount">0</b> Hadir</span><span><b id="notAttendingCount">0</b> Tidak Hadir</span><span><b id="maybeCount">0</b> Masih Ragu</span></div>
       <form class="rsvp-form" id="rsvpForm"><label>Nama<input name="name" id="rsvpName" maxlength="80" required placeholder="Masukkan nama"></label><label>Ucapan<textarea name="message" maxlength="500" rows="4" required placeholder="Berikan ucapan dan doa"></textarea></label><label>Kehadiran<select name="attendance" id="attendance" required><option value="">Pilih kehadiran</option><option value="hadir">Hadir</option><option value="tidak_hadir">Tidak hadir</option><option value="ragu">Masih ragu</option></select></label><label id="guestCountWrap">Jumlah hadir<select name="guestCount"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option></select></label><button class="solid-button" type="submit" data-k="rsvpButtonText">Kirim Ucapan</button><p class="form-status" id="rsvpStatus" role="status"></p></form>
@@ -88,9 +82,9 @@
   </main>
 
   <button class="music-control" id="musicButton" type="button" aria-label="Putar musik"><span>♫</span><small>Music</small></button>
-  <nav class="bottom-nav" aria-label="Navigasi undangan"><a href="#home"><span>⌂</span><small data-k="navHome">Home</small></a><a href="#couple"><span>♡</span><small data-k="navChild">Anak</small></a><a href="#events"><span>▣</span><small data-k="navEvent">Acara</small></a><a href="#gallerySection"><span>▦</span><small data-k="navGallery">Galeri</small></a><a href="#rsvp"><span>☏</span><small>Ucapan</small></a></nav>
+  <nav class="bottom-nav" aria-label="Navigasi undangan"><a href="#home"><span>⌂</span><small data-k="navHome">Home</small></a><a href="#couple"><span>♡</span><small data-k="navChild">Anak</small></a><a href="#events"><span>▣</span><small data-k="navEvent">Acara</small></a><a href="#gallerySection"><span>▦</span><small data-k="navGallery">Galeri</small></a><a href="#rsvp"><span>☏</span><small data-k="navRsvp">Ucapan</small></a></nav>
   <div class="lightbox" id="lightbox" hidden><button id="lightboxClose" aria-label="Tutup">×</button><img id="lightboxImage" alt="Foto galeri diperbesar"><button id="lightboxPrev" class="lightbox-arrow prev" aria-label="Foto sebelumnya">‹</button><button id="lightboxNext" class="lightbox-arrow next" aria-label="Foto selanjutnya">›</button></div>
   <div class="toast" id="toast" role="status"></div>
-  <script type="module" src="app.js?v=sky-2"></script>
+  <script type="module" src="app.js?v=polish-3"></script>
 </body>
 </html>

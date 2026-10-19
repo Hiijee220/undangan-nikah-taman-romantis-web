@@ -2,9 +2,9 @@ const PROJECT_ID="jeivan-82577";
 const DOCUMENT_ROOT=`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 const INVITATION_ROOT=`${DOCUMENT_ROOT}/invitationTamanRomantis/`;
 
-import {defaults as fallback} from './defaults.js?v=sky-2';
-import {baptismContent} from './content.mjs?v=sky-2';
-import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=sky-2';
+import {defaults as fallback} from './defaults.js?v=polish-3';
+import {baptismContent} from './content.mjs?v=polish-3';
+import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=polish-3';
 
 const $=selector=>document.querySelector(selector);
 const safe=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -29,8 +29,8 @@ function renderTimeline(images=[]){const storyImages=[1,2,3].map((number,index)=
 function renderGallery(urls){currentGallery=(urls||[]).map(safeImage).filter(Boolean);if(!currentGallery.length)currentGallery=[safeImage(content.childImage)||safeImage(content.coverImage)].filter(Boolean);$("#gallery").innerHTML=currentGallery.map((url,index)=>`<button class="gallery-item" type="button" data-gallery="${index}" aria-label="Buka foto ${index+1}"><img src="${safe(url)}" alt="Foto galeri ${index+1}" loading="lazy"></button>`).join("");document.querySelectorAll("[data-gallery]").forEach(button=>button.onclick=()=>openLightbox(Number(button.dataset.gallery)))}
 function venueMapsLink(kind){const query=[content[`${kind}Venue`],content[`${kind}Address`]].filter(v=>v&&!String(v).includes("[")).join(", ");return query?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`:""}
 function renderVenueMaps(){for(const kind of ['ceremony','reception']){const frame=$(`#${kind}MapFrame`),venue=String(content[`${kind}Venue`]||''),address=String(content[`${kind}Address`]||'');const query=[venue,address].filter(v=>v&&!v.includes('[')).join(', ');frame.hidden=!query;if(query){const src=`https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;if(frame.getAttribute('src')!==src)frame.src=src}else frame.removeAttribute('src')}}
-function renderLinks(){renderVenueMaps();setLink("#ceremonyMaps",content.ceremonyMapsUrl||content.mapsUrl||venueMapsLink("ceremony"));setLink("#receptionMaps",content.receptionMapsUrl||content.mapsUrl||venueMapsLink("reception"));setLink("#childInstagram",content.childInstagramUrl);setLink("#familyInstagram",content.familyInstagramUrl);setLink("#whatsappLink",content.whatsappUrl);setLink("#instagramLink",content.instagramUrl);const number=String(content.giftWhatsappNumber||"").replace(/\D/g,"");setLink("#giftWhatsapp",number?`https://wa.me/${number}?text=${encodeURIComponent(content.giftWhatsappMessage||"")}`:"")}
-function configureMusic(){const key=String(content.musicUrl||"").trim();if(key===musicKey)return;musicKey=key;music?.pause();music?.remove();music=null;youtubeFrame?.remove();youtubeFrame=null;musicPlaying=false;musicState(false);$("#musicButton").hidden=!key}
+function renderLinks(){renderVenueMaps();setLink("#ceremonyMaps",content.ceremonyMapsUrl||content.mapsUrl||venueMapsLink("ceremony"));setLink("#receptionMaps",content.receptionMapsUrl||content.mapsUrl||venueMapsLink("reception"));setLink("#childInstagram",content.childInstagramUrl);setLink("#familyInstagram",content.familyInstagramUrl);setLink("#whatsappLink",content.whatsappUrl);setLink("#instagramLink",content.instagramUrl);}
+function configureMusic(){$("#musicButton").title=content.musicTitle||"Musik Baptisan";const key=String(content.musicUrl||"").trim();if(key===musicKey)return;musicKey=key;music?.pause();music?.remove();music=null;youtubeFrame?.remove();youtubeFrame=null;musicPlaying=false;musicState(false);$("#musicButton").hidden=!key}
 function render(){
   document.documentElement.dataset.theme=content.theme||"sky";parseEventDate();setText();document.title=`${content.childName} — Undangan Baptisan`;$("#receptionCard").hidden=content.showReception==="no";$("#guestName").textContent=guestFromLink;$("#rsvpName").value=guestFromLink==="Bapak/Ibu/Saudara/i"?"":guestFromLink;
   if(!Number.isNaN(eventDate.getTime())){const options={timeZone:'Asia/Makassar'};$("#eventMonth").textContent=eventDate.toLocaleDateString('id-ID',{...options,month:'short'}).replace('.','').toUpperCase();$("#eventDay").textContent=eventDate.toLocaleDateString('id-ID',{...options,day:'2-digit'});$("#eventYear").textContent=eventDate.toLocaleDateString('id-ID',{...options,year:'numeric'});}
@@ -59,8 +59,6 @@ function showToast(message){const toast=$("#toast");toast.textContent=message;to
 async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("Berhasil disalin")}catch{const area=document.createElement("textarea");area.value=text;document.body.append(area);area.select();document.execCommand("copy");area.remove();showToast("Berhasil disalin")}}
 
 $("#openInvitation").onclick=()=>{invitationOpened=true;$("#cover").classList.add("opened");document.body.classList.remove("is-locked");$(".bottom-nav").classList.add("visible");$("#home").scrollIntoView({block:"start",behavior:"instant"});$("#cover").setAttribute("aria-hidden","true");$("#cover").inert=true;playMusic()};
-$("#toggleGift").onclick=()=>{const details=$("#giftDetails"),show=details.hidden;details.hidden=!show;$("#toggleGift").textContent=show?content.hideAccountText:content.showAccountText};
-$("#copyAccount").onclick=()=>copyText(content.accountNumber||"");
 $("#attendance").onchange=event=>{$("#guestCountWrap").hidden=event.target.value!=="hadir"};
 
 function setLightboxArrows(visible){$("#lightboxPrev").hidden=!visible;$("#lightboxNext").hidden=!visible}
