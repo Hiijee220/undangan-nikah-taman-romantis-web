@@ -1,8 +1,8 @@
 import{auth,db,CONTENT_COLLECTION,ADMIN_EMAIL}from"./firebase.js";
-import{defaults}from"./defaults.js?v=baptisan-1";
-import {baptismContent} from "./content.mjs?v=baptisan-1";
+import{defaults}from"./defaults.js?v=sky-2";
+import {baptismContent} from "./content.mjs?v=sky-2";
 import{saveContent}from"./persistence.mjs";
-import{cleanContent,firebaseError,safeImage}from"./validation.mjs";
+import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=sky-2";
 import{GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import{doc,getDoc,setDoc,runTransaction}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
@@ -15,7 +15,7 @@ const fieldGroups=[
   ["Tanggal Utama",[["eventLabel","Tulisan Save the date"],["eventTitle","Judul bagian acara"],["date","Tanggal baptisan","date"],["eventStartTime","Jam mulai untuk hitung mundur","time"],["mapsButtonText","Tulisan tombol Maps"]]],
   ["Ibadah Baptisan",[["ceremonyTitle","Nama acara"],["ceremonyTime","Waktu baptisan"],["ceremonyVenue","Nama tempat baptisan"],["ceremonyAddress","Alamat baptisan","textarea"],["ceremonyMapsUrl","Link Google Maps baptisan","url"]]],
   ["Syukuran (Opsional)",[["showReception","Tampilkan syukuran","select"],["receptionTitle","Nama acara"],["receptionTime","Waktu syukuran"],["receptionVenue","Nama tempat syukuran"],["receptionAddress","Alamat syukuran","textarea"],["receptionMapsUrl","Link Google Maps syukuran","url"]]],
-  ["Galeri",[["galleryLabel","Tulisan Our Gallery"],["galleryTitle","Judul galeri"]]],
+  ["Galeri",[["galleryLabel","Tulisan Our Gallery"],["galleryTitle","Judul galeri"],["galleryBlessing","Ayat / doa di atas galeri","textarea"],["galleryBlessingReference","Sumber ayat galeri"]]],
   ["Cerita 1",[["journey1Year","Tahun / tanggal cerita 1"],["journey1Title","Judul cerita 1"],["journey1Text","Isi cerita 1","textarea"]]],
   ["Cerita 2",[["journey2Year","Tahun / tanggal cerita 2"],["journey2Title","Judul cerita 2"],["journey2Text","Isi cerita 2","textarea"]]],
   ["Cerita 3",[["journey3Year","Tahun / tanggal cerita 3"],["journey3Title","Judul cerita 3"],["journey3Text","Isi cerita 3","textarea"]]],

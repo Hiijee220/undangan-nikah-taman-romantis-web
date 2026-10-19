@@ -5,7 +5,7 @@ import {defaults} from './defaults.js';
 import {cleanContent,cleanRsvp,safeLink,safeImage} from './validation.mjs';
 import {saveContent} from './persistence.mjs';
 for(const file of ['app.js','admin.js','firebase.js','defaults.js','validation.mjs','persistence.mjs'])execFileSync(process.execPath,['--check',file]);
-assert.equal(cleanContent(defaults).theme,'sage');
+assert.equal(cleanContent(defaults).theme,'sky');
 assert.equal(safeLink('javascript:alert(1)'),'');
 assert.equal(safeLink('https://user:password@example.com/'),'');
 assert.equal(safeImage('data:image/svg+xml;base64,AAAA'),'');
@@ -51,3 +51,6 @@ assert.equal(baptismContent({contentType:'baptisan',childName:'Joel'}).childName
 assert.ok(admin.includes('["showReception","Tampilkan syukuran","select"]'));
 assert.ok(html.includes('id="receptionCard"'));
 console.log('PASS: baptism migration, editable child/family fields and optional thanksgiving.');
+
+assert.equal(safeImage('./baby-placeholder.svg'),'./baby-placeholder.svg');
+assert.ok(html.includes('ceremonyMapFrame'));assert.ok(html.includes('baptism.css'));

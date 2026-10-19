@@ -75,7 +75,7 @@ export const defaults={
   "instagramUrl": "",
   "musicTitle": "Musik Baptisan",
   "musicUrl": "https://hiijee220.github.io/undangan-nikah-taman-romantis-web/audio/serene.mp3",
-  "theme": "sage",
+  "theme": "sky",
   "navHome": "Home",
   "navChild": "Anak",
   "navEvent": "Acara",
@@ -95,11 +95,13 @@ export const defaults={
   "story3ImageId": "",
   "closingImageId": "",
   "galleryIds": [],
-  "coverImage": "./garden.webp",
-  "childImage": "./garden.webp",
-  "familyImage": "./garden.webp",
-  "closingImage": "./garden.webp",
+  "coverImage": "./baby-placeholder.svg",
+  "childImage": "./baby-placeholder.svg",
+  "familyImage": "./baby-placeholder.svg",
+  "closingImage": "./baby-placeholder.svg",
   "gallery": [],
   "contentType": "baptisan",
-  "showReception": "yes"
+  "showReception": "yes",
+  "galleryBlessing": "Tuhan memberkati engkau dan melindungi engkau. Tuhan menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia.",
+  "galleryBlessingReference": "Bilangan 6:24–26"
 };

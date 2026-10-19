@@ -6,7 +6,7 @@ export function safeLink(value){
 export function safeImage(value){
  if(typeof value!=='string')return '';
  if(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value)&&value.length<900000)return value;
- if(/^\.\/(garden\.webp|uploads\/[a-z0-9-]+\.(jpg|png|webp))$/.test(value))return value;
+ if(/^\.\/(garden\.webp|baby-placeholder\.svg|uploads\/[a-z0-9-]+\.(jpg|png|webp))$/.test(value))return value;
  return safeLink(value);
 }
 export function cleanContent(value){
