@@ -1,4 +1,4 @@
-import {defaults} from './defaults.js?v=music-5';
+import {defaults} from './defaults.js?v=audio-8';
 
 export function splitParents(value='') {
  const parts=String(value).split(/\s*(?:&|＆|\bdan\b)\s*/i).map(v=>v.trim()).filter(Boolean);

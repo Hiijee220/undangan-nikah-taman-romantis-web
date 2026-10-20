@@ -92,8 +92,8 @@ scroller.start(1800);assert.ok(scroller.running);frame(0);frame(1700);assert.equ
 scroller.start();frame(2000);frame(12000);assert.equal(offset,2); // Background-tab gaps cannot jump the page.
 for(let time=12050;time<18000&&scroller.running;time+=50)frame(time);
 assert.equal(scroller.running,false);assert.ok(offset>=99&&offset<=100);
-const upgraded=baptismContent({contentType:'baptisan',musicUrl:'https://example.com/old.mp3'});assert.ok(upgraded.musicUrl.endsWith('/audio/mary-star-li.mp3'));assert.equal(upgraded.musicRelease,'mary-v1');
-const customized=baptismContent({contentType:'baptisan',musicRelease:'mary-v1',musicUrl:'https://example.com/new.mp3'});assert.equal(customized.musicUrl,'https://example.com/new.mp3');
+const upgraded=baptismContent({contentType:'baptisan',musicRelease:'mary-v1',musicUrl:'https://example.com/old.mp3'});assert.equal(upgraded.musicUrl,defaults.musicUrl);assert.equal(upgraded.musicRelease,defaults.musicRelease);
+const customized=baptismContent({contentType:'baptisan',musicRelease:defaults.musicRelease,musicUrl:'https://example.com/new.mp3'});assert.equal(customized.musicUrl,'https://example.com/new.mp3');
 assert.throws(()=>cleanContent({...defaults,autoScrollSpeed:'invalid'}));
 assert.ok(html.includes('id="autoScrollButton"'));assert.ok(app.includes("document.addEventListener('visibilitychange'"));
 const groupsCode=admin.slice(admin.indexOf('const fieldGroups='),admin.indexOf('const imageSlots=')),fieldsCode=admin.slice(admin.indexOf('function renderFields()'),admin.indexOf('const imageUrl='));

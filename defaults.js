@@ -59,8 +59,8 @@ export const defaults={
   "closingCredit": "Made with love",
   "whatsappUrl": "",
   "instagramUrl": "",
-  "musicTitle": "Mary Star Li",
-  "musicUrl": "https://hiijee220.github.io/undangan-nikah-taman-romantis-web/audio/mary-star-li.mp3",
+  "musicTitle": "Musik Baptisan Joel",
+  "musicUrl": "https://hiijee220.github.io/undangan-nikah-taman-romantis-web/audio/baptisan-joel-20261020.m4a",
   "theme": "sky",
   "navHome": "Home",
   "navChild": "Anak",
@@ -92,7 +92,7 @@ export const defaults={
   "fatherName": "[Nama ayah]",
   "motherName": "[Nama ibu]",
   "navRsvp": "Ucapan",
-  "musicRelease": "mary-v1",
+  "musicRelease": "joel-audio-20261020-v2",
   "autoScrollEnabled": "yes",
   "autoScrollSpeed": "normal"
 };

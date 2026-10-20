@@ -1,6 +1,6 @@
 import{auth,db,CONTENT_COLLECTION,ADMIN_EMAIL}from"./firebase.js";
-import{defaults}from"./defaults.js?v=music-5";
-import {baptismContent} from "./content.mjs?v=music-5";
+import{defaults}from"./defaults.js?v=audio-8";
+import {baptismContent} from "./content.mjs?v=audio-8";
 import{saveContent}from"./persistence.mjs";
 import{cleanContent,firebaseError,safeImage}from"./validation.mjs?v=music-5";
 import{GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";

@@ -2,8 +2,8 @@ const PROJECT_ID="jeivan-82577";
 const DOCUMENT_ROOT=`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 const INVITATION_ROOT=`${DOCUMENT_ROOT}/invitationTamanRomantis/`;
 
-import {defaults as fallback} from './defaults.js?v=music-5';
-import {baptismContent} from './content.mjs?v=music-5';
+import {defaults as fallback} from './defaults.js?v=audio-8';
+import {baptismContent} from './content.mjs?v=audio-8';
 import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=music-5';
 
 import {createPhotoLoader,mapPhotos} from './photo-cache.mjs?v=music-5';
