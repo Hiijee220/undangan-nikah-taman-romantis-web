@@ -1,5 +1,7 @@
 # Undangan Baptisan Anak
 
+Pratinjau berbagi memakai metadata Open Graph statis di `index.html` dan kartu JPEG `share-baptisan-joel-v1.jpg` (1200 × 630). Kartu mengikuti foto sampul dan informasi acara yang dibaca pada saat publikasi; bila nama, tanggal, atau foto di admin berubah, aset dan metadata berbagi perlu diterbitkan ulang. Link tamu menyertakan versi pratinjau baru. Tamu tetap diambil dari parameter `to` seperti sebelumnya.
+
 Website publik melalui GitHub Pages, admin di `admin.html` dengan Firebase Google/email.
 
 Admin: profil anak, orang tua/wali baptis, ayat, jadwal dan gereja, syukuran opsional, enam tema, sampul/slideshow/galeri, musik, rekening, ucapan dan RSVP. Tekan **Simpan Semua Perubahan** untuk menerbitkan perubahan data; unggah foto menyimpan langsung.
