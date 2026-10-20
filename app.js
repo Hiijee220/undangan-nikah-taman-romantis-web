@@ -1,9 +1,10 @@
+import {resolveGuestName} from './guest-links.mjs?v=share-9';
 const PROJECT_ID="jeivan-82577";
 const DOCUMENT_ROOT=`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 const INVITATION_ROOT=`${DOCUMENT_ROOT}/invitationTamanRomantis/`;
 
 import {defaults as fallback} from './defaults.js?v=audio-8';
-import {baptismContent} from './content.mjs?v=audio-8';
+import {baptismContent} from './content.mjs?v=share-9';
 import {safeLink,safeImage,cleanRsvp} from './validation.mjs?v=music-5';
 
 import {createPhotoLoader,mapPhotos} from './photo-cache.mjs?v=music-5';
@@ -19,7 +20,7 @@ const getImage=createPhotoLoader(async id=>(await getDocument(id)).dataUrl,{vali
 async function loadContent(){try{return baptismContent(await getDocument("content"))}catch(error){console.info("Data online belum tersedia, memakai data cadangan.",error.message);return{...fallback}}}
 
 let content={...fallback},eventDate=new Date(),countdownTimer=null,heroTimer=null,currentGallery=[],lightboxIndex=0,music=null,youtubeFrame=null,musicPlaying=false,musicKey="",invitationOpened=false;
-const guestFromLink=new URLSearchParams(location.search).get("to")?.trim()||"Bapak/Ibu/Saudara/i";
+let guestFromLink=resolveGuestName(location.search,content);
 
 const scrollButton=$('#autoScrollButton');let previousScrollBehavior='';
 const autoScroller=createAutoScroller({position:()=>window.scrollY,limit:()=>Math.max(0,document.documentElement.scrollHeight-window.innerHeight),move:top=>window.scrollTo(0,top),request:callback=>requestAnimationFrame(callback),cancel:id=>cancelAnimationFrame(id),change:running=>{
@@ -104,4 +105,4 @@ function renderResponses(items){const counts={hadir:0,tidak_hadir:0,ragu:0};item
 $("#rsvpForm").onsubmit=async event=>{event.preventDefault();const form=event.currentTarget,status=$("#rsvpStatus"),button=form.querySelector("button[type=submit]"),values=Object.fromEntries(new FormData(form));button.disabled=true;status.textContent="Mengirim ucapan...";try{await submitRsvp(values);status.textContent="Terima kasih. Ucapan Anda berhasil dikirim.";form.reset();$("#guestCountWrap").hidden=true;await loadResponses()}catch(error){status.textContent=error.message}finally{button.disabled=false}};
 
 render();observeReveals();$("#guestCountWrap").hidden=true;requestAnimationFrame(()=>$("#pageLoader").classList.add("hidden"));
-loadContent().then(async saved=>{content=saved;render();await hydrateImages();observeReveals()});loadResponses();
+loadContent().then(async saved=>{content=saved;guestFromLink=resolveGuestName(location.search,content);render();await hydrateImages();observeReveals()});loadResponses();

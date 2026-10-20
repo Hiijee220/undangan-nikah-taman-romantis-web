@@ -100,3 +100,5 @@ const groupsCode=admin.slice(admin.indexOf('const fieldGroups='),admin.indexOf('
 const target={innerHTML:''};new Function('data','$','esc',groupsCode+fieldsCode+';renderFields();')(defaults,()=>target,v=>String(v??''));
 assert.ok(target.innerHTML.includes('<select name="autoScrollSpeed">'));assert.ok(target.innerHTML.includes('value="slow"'));assert.ok(!target.innerHTML.includes('type="scroll-speed"'));
 console.log('PASS: automatic scroll delay, pause, speed and page-end stop; no jump after tab gaps; music upgrade and later admin overrides; generated speed controls.');
+
+await import('./guest-links.test.mjs');

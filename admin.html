@@ -20,7 +20,7 @@
     </section>
 
     <div id="editor" hidden>
-      <section class="admin-card"><h2>Link Nama Tamu</h2><p>Masukkan nama tamu, lalu salin link khusus untuk dikirim melalui WhatsApp.</p><div class="guest-link-row"><input id="guestNameInput" placeholder="Contoh: Keluarga Bapak Silo"><button id="copyGuestLink" class="admin-button" type="button">Salin Link Tamu</button></div></section>
+      <section class="admin-card" id="bagikan"><h2>Bagikan Undangan</h2><p>Untuk tampilan pesan paling ringkas, gunakan Link Umum. Jika ingin sapaan pribadi, buat link tamu pendek. Link lama tetap dapat dibuka.</p><div class="guest-link-row"><input id="guestNameInput" maxlength="100" placeholder="Contoh: Keluarga Bapak Silo" aria-label="Nama tamu"><button id="copyGuestLink" class="admin-button" type="button">Buat Link Tamu Pendek</button></div><label style="display:block;margin-top:18px">Link siap dikirim<input id="readyGuestLink" type="url" readonly style="width:100%" aria-label="Link siap dikirim"></label><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px"><button id="useGeneralLink" type="button" class="admin-button secondary">Pakai Link Umum</button><button id="copyReadyLink" type="button" class="admin-button">Salin Link</button><button id="shareReadyLink" type="button" class="admin-button">Bagikan</button><a id="shareWhatsApp" class="admin-button secondary" target="_blank" rel="noopener">Buka WhatsApp ↗</a></div><p id="guestShareStatus" role="status"></p><p class="helper">Pesan yang dibagikan hanya berisi tautan. Tautan tamu menyimpan nama lewat kode pendek. Bentuk pratinjau dan alamat yang terlihat tetap mengikuti WhatsApp di perangkat penerima.</p></section>
       <form id="contentForm">
         <section class="admin-card"><h2>Tema Undangan</h2><p>Desain awan, balon udara, bintang, malaikat kecil, dan bingkai lengkung mengikuti referensi baptisan. Pilih Biru Awan & Malaikat untuk warna seperti contoh.</p><label>Pilih tema<select id="theme"><option value="sky">Biru Awan & Malaikat</option><option value="forest">Forest Gold</option><option value="rose">Rose Romance</option><option value="navy">Navy Elegant</option><option value="sage">Sage Natural</option><option value="terracotta">Terracotta</option></select></label><div class="theme-swatches"><i class="sky"></i><i class="forest"></i><i class="rose"></i><i class="navy"></i><i class="sage"></i><i class="terracotta"></i></div></section>
         <section class="admin-card"><h2>Data Baptisan Anak</h2><p>Isi nama anak, orang tua, wali baptis, gereja, jadwal baptisan dan syukuran, foto, musik, serta tulisan undangan. Data contoh dapat Anda ganti kapan saja.</p><div id="fields"></div></section>
@@ -31,6 +31,6 @@
       </form>
     </div>
   </main>
-  <script type="module" src="admin.js?v=audio-8"></script>
+  <script type="module" src="admin.js?v=share-9"></script>
 </body>
 </html>

@@ -17,6 +17,6 @@ function completeBaptism(result,saved) {
 export function baptismContent(saved={}) {
  if(saved.contentType==='baptisan')return completeBaptism({...defaults,...saved},saved);
  const result={...defaults};
- for(const [key,value] of Object.entries(saved))if(value!=null&&(/Image(Id)?$|Ids$/.test(key)||['coverId','heroId','theme','musicUrl','musicTitle','revision'].includes(key)))result[key]=value;
+ for(const [key,value] of Object.entries(saved))if(value!=null&&(/Image(Id)?$|Ids$/.test(key)||['coverId','heroId','theme','musicUrl','musicTitle','revision','guestLinks'].includes(key)))result[key]=value;
  return completeBaptism(result,{});
 }
