@@ -1,4 +1,4 @@
-import {invitationLink,registerGuestLink,normalizeGuestName} from './guest-links.mjs?v=share-9';
+import {registerGuestLink,normalizeGuestName} from './guest-links.mjs?v=share-9';
 import{auth,db,CONTENT_COLLECTION,ADMIN_EMAIL}from"./firebase.js";
 import{defaults}from"./defaults.js?v=audio-8";
 import {baptismContent} from "./content.mjs?v=share-9";
@@ -48,9 +48,9 @@ $("#logoutBtn").onclick=()=>signOut(auth);
 
 let revision=0,ready=false,busy=false;
 function collectDraft(){new FormData($('#contentForm')).forEach((value,key)=>data[key]=value);data.theme=$('#theme').value;return cleanContent(data);}
-async function persistContent(){if(!ready)throw new Error('Data belum dimuat. Login dan periksa aturan penyimpanan terlebih dahulu.');const clean=collectDraft();const nextRevision=await saveContent(doc(db,CONTENT_COLLECTION,'content'),revision,clean,action=>runTransaction(db,action));revision=nextRevision;data={...clean,revision};}
+async function persistContent(){if(!ready)throw new Error('Data belum dimuat. Login dan periksa aturan penyimpanan terlebih dahulu.');const clean=collectDraft();const nextRevision=await saveContent(doc(db,CONTENT_COLLECTION,'content'),revision,clean,action=>runTransaction(db,action));revision=nextRevision;data={...clean,revision};refreshShareLink();}
 async function operation(action){if(busy)return;busy=true;$('#contentForm').inert=true;try{await action()}catch(error){setStatus(firebaseError(error),true)}finally{busy=false;$('#contentForm').inert=false;}}
-onAuthStateChanged(auth,async user=>{ready=false;$('#editor').hidden=true;$('#login').hidden=false;$('#verifyEmailBtn').hidden=true;$('#user').textContent=user?.email||'Silakan masuk';if(!user)return;if(user.email?.toLowerCase()!==ADMIN_EMAIL){setLoginStatus('Akun ini bukan admin undangan.',true);await signOut(auth);return;}if(!user.emailVerified){$('#verifyEmailBtn').hidden=false;setLoginStatus('Verifikasi email admin terlebih dahulu, atau masuk dengan akun Google yang sama.',true);return;}try{const snapshot=await getDoc(doc(db,CONTENT_COLLECTION,'content'));const saved=snapshot.exists()?snapshot.data():{};data=baptismContent(saved);revision=Number(saved.revision||0);ready=true;$('#login').hidden=true;$('#editor').hidden=false;await render();}catch(error){setLoginStatus(firebaseError(error),true);}});
+onAuthStateChanged(auth,async user=>{ready=false;$('#editor').hidden=true;$('#login').hidden=false;$('#verifyEmailBtn').hidden=true;$('#user').textContent=user?.email||'Silakan masuk';if(!user)return;if(user.email?.toLowerCase()!==ADMIN_EMAIL){setLoginStatus('Akun ini bukan admin undangan.',true);await signOut(auth);return;}if(!user.emailVerified){$('#verifyEmailBtn').hidden=false;setLoginStatus('Verifikasi email admin terlebih dahulu, atau masuk dengan akun Google yang sama.',true);return;}try{const snapshot=await getDoc(doc(db,CONTENT_COLLECTION,'content'));const saved=snapshot.exists()?snapshot.data():{};data=baptismContent(saved);revision=Number(saved.revision||0);refreshShareLink();ready=true;$('#login').hidden=true;$('#editor').hidden=false;await render();}catch(error){setLoginStatus(firebaseError(error),true);}});
 $('#verifyEmailBtn').onclick=async()=>{try{if(auth.currentUser?.email?.toLowerCase()!==ADMIN_EMAIL)throw new Error('Masuk menggunakan email admin terlebih dahulu.');await sendEmailVerification(auth.currentUser);setLoginStatus('Email verifikasi dikirim. Setelah verifikasi, muat ulang dan login kembali.');}catch(error){setLoginStatus(firebaseError(error),true);}};
 
 function renderFields(){$("#fields").innerHTML=fieldGroups.map(([title,fields])=>`<section class="field-group"><h3>${esc(title)}</h3><div class="field-group-grid">${fields.map(([key,label,type])=>`<label class="field ${type==="textarea"?"field-wide":""}"><span>${esc(label)}</span>${type==="scroll-speed"?`<select name="${key}">${[["slow","Pelan"],["normal","Sedang"],["fast","Cepat"]].map(([value,title])=>`<option value="${value}" ${data[key]===value?"selected":""}>${title}</option>`).join("")}</select>`:type==="select"?`<select name="${key}"><option value="yes" ${data[key]!=="no"?"selected":""}>Ya</option><option value="no" ${data[key]==="no"?"selected":""}>Tidak</option></select>`:type==="textarea"?`<textarea name="${key}">${esc(data[key])}</textarea>`:`<input name="${key}" type="${type||"text"}" value="${esc(data[key])}">`}</label>`).join("")}</div></section>`).join("")}
@@ -85,14 +85,21 @@ async function uploadSingle(input){collectDraft();const file=input.files?.[0],ke
 async function uploadCollection(input,key,limit){collectDraft();const files=Array.from(input.files||[]);if(!files.length)return;try{const current=Array.isArray(data[key])?data[key]:[],allowed=files.slice(0,Math.max(0,limit-current.length));if(!allowed.length)throw new Error(`Batas maksimal ${limit} foto sudah tercapai.`);for(let index=0;index<allowed.length;index++){setStatus(`Memproses foto ${index+1}/${allowed.length}...`);const id=uniqueId(key==="galleryIds"?"gallery":"opening");await saveImage(id,allowed[index]);current.push(id)}data[key]=current;await persistContent();await renderCollection(key,key==="openingIds"?"#openingThumbs":"#galleryThumbs");setStatus("Semua foto berhasil diunggah.")}catch(error){setStatus(firebaseError(error),true)}finally{input.value=""}}
 $("#openingUpload").onchange=event=>operation(()=>uploadCollection(event.target,"openingIds",4));$("#galleryUpload").onchange=event=>operation(()=>uploadCollection(event.target,"galleryIds",10));
 $("#theme").onchange=event=>{data.theme=event.target.value;document.documentElement.dataset.theme=data.theme};
-let readyGuestName='',readyShareUrl=invitationLink(location.href);
+function shareLink(code=''){
+ const url=new URL("https://baptisan-joel-share.jeivan-s-momongan.chatgpt.site/");
+ if(/^[A-Za-z0-9_-]{8}$/.test(code))url.searchParams.set('g',code);
+ if(Number.isSafeInteger(revision)&&revision>0)url.searchParams.set('v',String(revision));
+ return url.href;
+}
+let readyGuestName='',readyGuestCode='',readyShareUrl=shareLink();
+function refreshShareLink(){showShareLink(shareLink(readyGuestCode),guestShareStatus.textContent)}
 const guestShareStatus=$('#guestShareStatus'),readyGuestLink=$('#readyGuestLink');
 function showShareLink(url,message=''){
  readyShareUrl=url;readyGuestLink.value=url;guestShareStatus.textContent=message;
  $('#shareWhatsApp').href='https://wa.me/?text='+encodeURIComponent(url);
 }
 showShareLink(readyShareUrl,'Tautan umum siap dibagikan tanpa kode nama tamu.');
-$('#guestNameInput').addEventListener('input',()=>{if($('#guestNameInput').value.trim()!==readyGuestName){showShareLink(invitationLink(location.href),'Nama berubah. Tekan Buat Link Tamu Pendek untuk membuat tautan khusus.');readyGuestName=''}});
+$('#guestNameInput').addEventListener('input',()=>{if($('#guestNameInput').value.trim()!==readyGuestName){showShareLink(shareLink(),'Nama berubah. Tekan Buat Link Tamu Pendek untuk membuat tautan khusus.');readyGuestName='';readyGuestCode=''}});
 $("#copyGuestLink").onclick=async()=>{
  if(busy)return;let name;try{name=normalizeGuestName($('#guestNameInput').value)}catch(error){guestShareStatus.textContent=error.message;return}
  const button=$('#copyGuestLink');button.disabled=true;busy=true;
@@ -101,10 +108,10 @@ $("#copyGuestLink").onclick=async()=>{
   guestShareStatus.textContent='Menyiapkan tautan pendek...';
   const code=await registerGuestLink(doc(db,CONTENT_COLLECTION,'content'),name,action=>runTransaction(db,action));
   if($('#guestNameInput').value.trim().replace(/\s+/g,' ')!==name)return;
-  readyGuestName=name;showShareLink(invitationLink(location.href,code),'Tautan untuk '+name+' siap. Pilih Salin atau Bagikan.');
+  readyGuestName=name;readyGuestCode=code;showShareLink(shareLink(code),'Tautan untuk '+name+' siap. Pilih Salin atau Bagikan.');
  }catch(error){guestShareStatus.textContent=firebaseError(error)}finally{button.disabled=false;busy=false}
 };
-$('#useGeneralLink').onclick=()=>{readyGuestName='';$('#guestNameInput').value='';showShareLink(invitationLink(location.href),'Tautan umum siap dibagikan tanpa kode nama tamu.')};
+$('#useGeneralLink').onclick=()=>{readyGuestName='';readyGuestCode='';$('#guestNameInput').value='';showShareLink(shareLink(),'Tautan umum siap dibagikan tanpa kode nama tamu.')};
 $('#copyReadyLink').onclick=async()=>{
  try{await navigator.clipboard.writeText(readyShareUrl);guestShareStatus.textContent='Tautan disalin. Tempelkan di WhatsApp.'}
  catch{readyGuestLink.focus();readyGuestLink.select();readyGuestLink.setSelectionRange(0,readyGuestLink.value.length);guestShareStatus.textContent='Tekan lama tautan yang dipilih, lalu Salin.'}
