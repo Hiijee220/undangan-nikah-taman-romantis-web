@@ -86,7 +86,7 @@ async function uploadCollection(input,key,limit){collectDraft();const files=Arra
 $("#openingUpload").onchange=event=>operation(()=>uploadCollection(event.target,"openingIds",4));$("#galleryUpload").onchange=event=>operation(()=>uploadCollection(event.target,"galleryIds",10));
 $("#theme").onchange=event=>{data.theme=event.target.value;document.documentElement.dataset.theme=data.theme};
 function shareLink(code=''){
- const url=new URL('./',location.href);
+ const url=new URL('https://hiijee220.github.io/undangan-baptisan-joel/');
  if(/^[A-Za-z0-9_-]{8}$/.test(code))url.searchParams.set('g',code);
  if(Number.isSafeInteger(revision)&&revision>0)url.searchParams.set('v',String(revision));
  return url.href;
